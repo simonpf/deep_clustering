@@ -15,8 +15,9 @@ class Shapes(Dataset):
 
     def __getitem__(self, idx):
         im = Image.open(self.files[idx])
-        im = np.array(im, dtype = np.float32)
-        im = np.sum(im[:, :, :3], axis = -1)
-        if not im.max() == 0.0:
-            im /= im.max()
-        return im[np.newaxis, :, :]
+        x = np.array(im, dtype = np.float32)
+        im.close()
+        x = np.sum(x[:, :, :3], axis = -1)
+        if not x.max() == 0.0:
+            x /= x.max()
+        return torch.tensor(x[np.newaxis, :, :])

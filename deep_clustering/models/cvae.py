@@ -13,7 +13,11 @@ class Cvae(nn.Module):
         encoder_modules = []
         in_channels = channels
         for c in arch:
-            encoder_modules += [nn.Conv2d(in_channels, c, 3, stride = 2, padding = 1)]
+            encoder_modules += [nn.Conv2d(in_channels, c, 3, stride = 1)]
+            encoder_modules += [nn.BatchNorm2d(c)]
+            encoder_modules += [nn.ReLU()]
+            encoder_modules += [nn.Conv2d(c, c, 3, stride = 2)]
+            encoder_modules += [nn.BatchNorm2d(c)]
             encoder_modules += [nn.ReLU()]
             in_channels = c
         self.encoder = nn.Sequential(*encoder_modules)
@@ -22,17 +26,21 @@ class Cvae(nn.Module):
         # Latent stuff
         #
 
-        self.latent_mu = nn.Conv2d( in_channels, latent_dim, kernel_size = 3, padding = 1)
-        self.latent_logvar = nn.Conv2d(in_channels, latent_dim, kernel_size = 3, padding = 1)
+        self.latent_mu = nn.Conv2d( in_channels, latent_dim, kernel_size = 3)
+        self.latent_logvar = nn.Conv2d(in_channels, latent_dim, kernel_size = 3)
 
         #
         # Decoder
         #
 
         decoder_modules = []
-        decoder_modules += [nn.Conv2d(latent_dim, in_channels, 3, padding = 1)]
+        decoder_modules += [nn.Conv2d(latent_dim, in_channels, 3)]
         for c in arch[-2::-1] + [channels]:
-            decoder_modules += [nn.ConvTranspose2d(in_channels, c, 3, stride = 2, padding = 1, output_padding = 1)]
+            decoder_modules += [nn.ConvTranspose2d(in_channels, c, 3, stride = 2, output_padding = 1)]
+            encoder_modules += [nn.BatchNorm2d(c)]
+            decoder_modules += [nn.ReLU()]
+            decoder_modules += [nn.ConvTranspose2d(c, c, 3)]
+            decoder_modules += [nn.BatchNorm2d(c)]
             decoder_modules += [nn.ReLU()]
             in_channels = c
         self.decoder = nn.Sequential(*decoder_modules)
