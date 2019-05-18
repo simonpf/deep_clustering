@@ -56,7 +56,6 @@ def train_network(data_set,
 
             x_r, mu, logvar = model(x)
             dn = (x.size()[-1] - x_r.size()[-1]) // 2
-            print(x_r.size(), x.size(), dn)
             optimizer.zero_grad()
             loss = criterion(x_r, x[:, :, dn : -dn, dn : -dn], mu, logvar)
             loss.backward()
