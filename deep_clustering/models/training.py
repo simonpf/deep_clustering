@@ -44,7 +44,7 @@ def train_network(data_set,
 
         if not dataset_callback is None:
             dataset_callback(data_set)
-        data_loader = DataLoader(data_set, batch_size = 32)
+        data_loader = DataLoader(data_set, batch_size = 64)
 
 
         epoch_loss = 0.0
@@ -57,7 +57,8 @@ def train_network(data_set,
             x_r, mu, logvar = model(x)
             dn = (x.size()[-1] - x_r.size()[-1]) // 2
             optimizer.zero_grad()
-            loss = criterion(x_r, x[:, :, dn : -dn, dn : -dn], mu, logvar)
+            #loss = criterion(x_r, x[:, :, dn : -dn, dn : -dn], mu, logvar)
+            loss = criterion(x_r, x, mu, logvar)
             loss.backward()
             optimizer.step()
 

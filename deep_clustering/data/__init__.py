@@ -17,7 +17,7 @@ class Shapes(Dataset):
         im = Image.open(self.files[idx])
         x = np.array(im, dtype = np.float32)
         im.close()
-        x = np.sum(x[:, :, :3], axis = -1)
+        x = np.sum(x[2:-2, 2:-2, :3], axis = -1)
         if not x.max() == 0.0:
             x /= x.max()
         return torch.tensor(x[np.newaxis, :, :])
