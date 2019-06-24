@@ -10,18 +10,18 @@ import torch
 import torch.optim
 import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader
-from deep_clustering.models.cvae import Cvae, loss_function
+from deep_clustering.models.cae import Cae, loss_function
 from deep_clustering.data import Shapes
 from deep_clustering.models.training import train_network
 
-model = Cvae(1, 10, [(64, 3), (64, 3), (96, 3), (96, 3)])
+model = Cae(1, 10, [(32, 1), (32, 1), (64, 1), (64, 1)])
 data = Shapes("/home/simonpf/src/deep_clustering/data")
 dl = DataLoader(data)
 optimizer = torch.optim.Adam(model.parameters())
 criterion = loss_function
-output_path = "cvae"
+output_path = "vae"
 
-train_network(data, model, optimizer, criterion, output_path, 4)
+train_network(data, model, optimizer, criterion, output_path, 1)
 i = iter(dl)
 x = next(i)
 x = next(i)

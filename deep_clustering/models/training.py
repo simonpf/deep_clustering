@@ -54,11 +54,9 @@ def train_network(data_set,
             if cuda:
                 x.cuda()
 
-            x_r, mu, logvar = model(x)
-            dn = (x.size()[-1] - x_r.size()[-1]) // 2
+            y = model(x)
             optimizer.zero_grad()
-            #loss = criterion(x_r, x[:, :, dn : -dn, dn : -dn], mu, logvar)
-            loss = criterion(x_r, x, mu, logvar)
+            loss = criterion(x, *y)
             loss.backward()
             optimizer.step()
 

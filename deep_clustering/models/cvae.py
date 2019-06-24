@@ -53,56 +53,6 @@ import torch.nn.functional as F
 #             x = m(x)
 #         return x
 
-class Encoder(nn.Module):
-    def __init__(self, in_channels, out_channels, depth, kernel_width = 3):
-        super(Encoder, self).__init__()
-
-        self.modules = []
-
-        self.modules += [nn.Conv2d(in_channels, out_channels, kernel_width, padding = 1)]
-        setattr(self, "conv2d_" + str(0), self.modules[-1])
-        self.modules += [nn.BatchNorm2d(out_channels)]
-        setattr(self, "batch_norm_" + str(0), self.modules[-1])
-        self.modules += [nn.ReLU()]
-
-        for i in range(1, depth):
-            self.modules += [nn.Conv2d(out_channels, out_channels, kernel_width, padding = 1)]
-            setattr(self, "conv2d_" + str(i), self.modules[-1])
-            self.modules += [nn.BatchNorm2d(out_channels)]
-            setattr(self, "batch_norm_" + str(i), self.modules[-1])
-            self.modules += [nn.ReLU()]
-
-        self.modules += [nn.Conv2d(out_channels, out_channels, kernel_width, padding = 1, stride = 2)]
-
-    def forward(self, x):
-        for m in self.modules:
-            x = m(x)
-        return x
-
-class Decoder(nn.Module):
-    def __init__(self, in_channels, out_channels, depth, kernel_width = 3):
-        super(Decoder, self).__init__()
-
-        self.modules = []
-
-        self.modules += [nn.ConvTranspose2d(in_channels, out_channels, kernel_width, padding = 1,
-                                            output_padding = 1, stride = 2)]
-        setattr(self, "conv2d_" + str(0), self.modules[-1])
-        self.modules += [nn.BatchNorm2d(out_channels)]
-        setattr(self, "batch_norm_" + str(0), self.modules[-1])
-        self.modules += [nn.ReLU()]
-
-        for i in range(1, depth):
-            self.modules += [nn.Conv2d(out_channels, out_channels, kernel_width, padding = 1)]
-            setattr(self, "conv2d_" + str(i), self.modules[-1])
-            self.modules += [nn.BatchNorm2d(out_channels)]
-            setattr(self, "batch_norm_" + str(i), self.modules[-1])
-            self.modules += [nn.ReLU()]
-
-    def forward(self, x):
-        for m in self.modules:
-            x = m(x)
-        return x
 
 class Cvae(nn.Module):
     def __init__(self, channels, latent_dim, arch = [(32, 2), (32, 2)]):
@@ -165,9 +115,7 @@ class Cvae(nn.Module):
         z = self.reparametrize(mu, logvar)
         return self.decode(z), mu, logvar
 
-def loss_function(recon_x, x, mu, logvar):
-    BCE = F.binary_cross_entropy(recon_x, x, reduction='sum')
+def loss_function(x, x_r, mu, logvar):
+    BCE = F.binary_cross_entropy(x_r, x, reduction='sum')
     KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
     return BCE + KLD
-
-
